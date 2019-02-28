@@ -272,7 +272,13 @@ class NotFoundException(Exception):
 
 
 def get_java_version(mx_version):
-    versions = {"7": "7u80", "8u51": "8u51", "8": "8", "8u202": "8u202", "11": "11"}
+    versions = {
+        "7": "7u80",
+        "8u51": "8u51",
+        "8": "8",
+        "8u202": "8u202",
+        "11": "11",
+    }
 
     if mx_version >= MXVersion("8"):
         default = "11"
@@ -491,12 +497,9 @@ def ensure_and_get_jvm(
     if not os.path.isdir(rootfs_java_path):
         logging.debug("rootfs without java sdk detected")
         download_and_unpack(
-            get_blobstore_url(
-                _compose_jre_url_path(java_version, package)
-            ),
+            get_blobstore_url(_compose_jre_url_path(java_version, package)),
             os.path.join(
-                dot_local_location,
-                _compose_jvm_target_dir(java_version),
+                dot_local_location, _compose_jvm_target_dir(java_version)
             ),
             cache_dir,
         )
@@ -508,8 +511,7 @@ def ensure_and_get_jvm(
         [
             _compose_jvm_target_dir(java_version),
             os.path.join(
-                dot_local_location,
-                _compose_jvm_target_dir(java_version),
+                dot_local_location, _compose_jvm_target_dir(java_version)
             ),
         ],
         "Java not found",
