@@ -6,8 +6,8 @@ import re
 import subprocess
 import sys
 from distutils.util import strtobool
-from urllib.parse import parse_qs
 from m2ee.version import MXVersion
+from urllib.parse import parse_qs
 
 sys.path.insert(0, "lib")
 
@@ -445,46 +445,39 @@ def ensure_and_get_mono(mx_version, cache_dir):
     return mono_location
 
 
-def _compose_jdk_url_path(java_version):
+def _determine_jdk_type(java_version, package="jdk"):
     oracle_jdks = ["7", "8u51", "8"]
     adoptopenjdk_jdks = ["8u202", "11"]
 
     if java_version in oracle_jdks:
-        jdk_type = "jdk"
+        return package
     elif java_version in adoptopenjdk_jdks:
-        jdk_type = "AdoptOpenJDK"
+        return "AdoptOpenJDK"
     else:
-        raise Exception("Unknown java version identifier: %s" % java_version)
+        raise Exception(
+            "Unknown java version identifier: {}".format(java_version)
+        )
 
-    return "/mx-buildpack/%s-%s-linux-x64.tar.gz" % (jdk_type, java_version)
+
+def _compose_jdk_url_path(java_version):
+    jdk_type = _determine_jdk_type(java_version)
+    return "/mx-buildpack/{type}-{version}-linux-x64.tar.gz".format(
+        type=jdk_type, version=java_version
+    )
 
 
 def _compose_jvm_target_dir(java_version):
-    oracle_jdks = ["7", "8u51", "8"]
-    adoptopenjdk_jdks = ["8u202", "11"]
-
-    if java_version in oracle_jdks:
-        jdk_type = "oracle"
-    elif java_version in adoptopenjdk_jdks:
-        jdk_type = "AdoptOpenJDK"
-    else:
-        raise Exception("Unknown java version identifier: %s" % java_version)
-
-    return "usr/lib/jvm/jdk-%s-%s-x64" % (java_version, jdk_type)
+    jdk_type = _determine_jdk_type(java_version)
+    return "usr/lib/jvm/jdk-{version}-{type}-x64".format(
+        version=java_version, type=jdk_type
+    )
 
 
 def _compose_jre_url_path(java_version, package):
-    oracle_jdks = ["7", "8u51", "8"]
-    adoptopenjdk_jdks = ["8u202", "11"]
-
-    if java_version in oracle_jdks:
-        jdk_type = package
-    elif java_version in adoptopenjdk_jdks:
-        jdk_type = "AdoptOpenJDK"
-    else:
-        raise Exception("Unknown java version identifier: %s" % java_version)
-
-    return "/mx-buildpack/%s-%s-linux-x64.tar.gz" % (jdk_type, java_version)
+    jdk_type = _determine_jdk_type(java_version, package)
+    return "/mx-buildpack/{type}-{version}-linux-x64.tar.gz".format(
+        type=jdk_type, version=java_version
+    )
 
 
 def ensure_and_get_jvm(
