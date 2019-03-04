@@ -6,12 +6,13 @@ import re
 import subprocess
 import sys
 from distutils.util import strtobool
-from m2ee.version import MXVersion
 from urllib.parse import parse_qs
 
 sys.path.insert(0, "lib")
 
 import requests  # noqa: E402
+
+from m2ee.version import MXVersion  # noqa: E402
 
 
 def get_database_config(development_mode=False):
